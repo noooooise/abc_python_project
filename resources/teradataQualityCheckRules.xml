@@ -1,0 +1,60 @@
+<checks>
+    <assembledTeradataPackageChecks>
+        <whens>
+            <when name="TCF Column (RECORD_DELETED_FLAG)" value="RECORD_DELETED_FLAG BYTEINT" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="TCF Column (PROCESS_NAME)" value="PROCESS_NAME CHAR" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="TCF Column (UPDATE_PROCESS_NAME)" value="UPDATE_PROCESS_NAME CHAR" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="TCF Column (CTL_ID)" value="CTL_ID SMALLINT" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="TCF Column (EXPY_D)" value="EXPY_D DATE" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="TCF Column (EXPY_TS)" value="EXPY_TS TIMESTAMP" type="BEGINS_WITH" scope="LINE" filter="CREATE_TABLE" />
+            <when name="Database Column" value="\sTITLE\s\'" type="MATCHES_PATTERN" scope="LINE" filter="CREATE_TABLE" />
+            <when name="Create Table Statement" value="TABLE P_D" type="CONTAINS" scope="LINE" filter="CREATE_TABLE" />
+            <when name="Create View Statement" value="REPLACE VIEW" type="BEGINS_WITH" scope="SCRIPT" filter="CREATE_VIEW" />
+            <when name="Create Comment Statement" value="COMMENT ON" type="CONTAINS" scope="SCRIPT" filter="CREATE_COMMENT" />
+            <when name="Non-Production Database Name" value="\s[A-OQ-Z]\_[DS][0-9]{2}\_[DVJF]" type="MATCHES_PATTERN" scope="LINE" filter="ALL" />
+            <when name="Create STG Table Statement" value="_STG." type="CONTAINS" scope="FILE_PATH" filter="ALL" />
+            <when name="Create WRK Table Statement" value="_WRK." type="CONTAINS" scope="FILE_PATH" filter="ALL" />
+            <when name="Create TEMP Table Statement" value="_TEMP." type="CONTAINS" scope="FILE_PATH" filter="ALL" />
+            <when name="Create Backup Table Statement" value="CREATE MULTISET TABLE" type="BEGINS_WITH" scope="LINE" filter="CREATE_BACKUP_TABLE" />
+            <when name="Create Backup View Statement" value="SHOW VIEW " type="BEGINS_WITH" scope="LINE" filter="CREATE_BACKUP_VIEW" />
+            <when name="Create Backup Table Comment Statement" value="COMMENT ON " type="BEGINS_WITH" scope="LINE" filter="CREATE_BACKUP_TABLE" />
+        </whens>
+        <actions>
+            <action name="Check for ByteInt Compression" patternMatch="COMPRESS\s?\(\s?0\s?,\s?1\s?\)" />
+            <action name="Check for String Compression" patternMatch="COMPRESS\s?\(?\'\s*\w+\s*\'\)?,?" />
+            <action name="Check for Compress Statement" textMatch="COMPRESS" />
+            <action name="Check for Number Compression" patternMatch="COMPRESS\s?\(?\d+\)?,?" />
+            <action name="Check for Date Compression" patternMatch="COMPRESS\s?\(?\s?DATE\s?\'\d{4}\-\d{2}\-\d{2}\'\)?,?" />
+            <action name="Check for TimeStamp Compression" patternMatch="COMPRESS\s?\(?\s?TIMESTAMP\s?\'\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}\.\d{6}\'\)?,?" />
+            <action name="Check for Multiset Statement" textMatch="MULTISET" />
+            <!--<action name="Check for Locking Rows" patternMatch="LOCKING\s+ROW\s+FOR\s+ACCESS" />-->
+            <action name="Check for Locking Rows" patternMatch="LOCKING\s+ROW\s+.*\s*ACCESS" />
+
+            <action name="Check Comment Size" patternMatch="IS '(.{0,257})'" />
+            <action name="Check for Production Database Name" patternMatch="\sP_" />
+            <action name="Check for STS File Type" noTextMatch=".sts" />
+            <action name="Check for CR Number" containsCrNumber="" />
+            <action name="Check for Teradata Keywords" containsTeradataKeywords="" />
+        </actions>
+        <rules>
+            <rule when="TCF Column (RECORD_DELETED_FLAG)" action="Check for ByteInt Compression" level="error" message="Record Deleted Columns must contain COMPRESS (0,1) ([[A-1]])"/>
+            <rule when="TCF Column (PROCESS_NAME)" action="Check for String Compression" level="error" message="Compress value is missing in Process Name ([[A-1]])"/>
+            <rule when="TCF Column (UPDATE_PROCESS_NAME)" action="Check for Compress Statement" level="error" message="Compress is missing in Update Process Name ([[A-1]])"/>
+            <rule when="TCF Column (CTL_ID)" action="Check for Number Compression" level="error" message="COMPRESS with some number is missing in CTL ID ([[A-1]])"/>
+            <rule when="TCF Column (EXPY_D)" action="Check for Date Compression" level="warning"  message="EXPY_D column must have compress date ([[A-1]])"/>
+            <rule when="TCF Column (EXPY_TS)" action="Check for TimeStamp Compression" level="warning" message="EXPY_TS column must have compress timestamp ([[A-1]])"/>
+            <rule when="Create Table Statement" action="Check for Multiset Statement" level="warning" message="Create Table Statements must contain MULTISET ([[A-2]])"/>
+            <rule when="Non-Production Database Name" action="Check for Production Database Name" level="error" message="Non-production database name is found([[A-3]])"/>
+            <rule when="Create Backup Table Statement" action="Check for CR Number" level="error" message="Backup Tables must contain the Change Record (CR) Number ([[A-4]])"/>
+            <!-- <rule when="Create Backup View Statement" action="Check for CR Number" level="error" message="Backup Views must contain the Change Record (CR) Number ([[A-4]])"/> -->
+            <rule when="Create Backup Table Comment Statement" action="Check for CR Number" level="error" message="Backup Table Comments must contain the Change Record (CR) Number ([[A-4]])"/>
+            <rule when="Create View Statement" action="Check for Locking Rows" level="error" message="LOCKING ROW should exist in the View([[A-6]])"/>
+            <rule when="Create Comment Statement" action="Check for CR Number" level="error" message="Comments must contain the Change Record (CR) Number ([[A-7]])"/>
+            <rule when="Create Comment Statement" action="Check Comment Size" level="error" message="Comments must be less than 256 characters ([[A-9]])"/>
+            <rule when="Database Column" action="Check for Teradata Keywords" level="error" message="Database Column contains Teradata keywords([[A-10]])"/>
+            <rule when="Create STG Table Statement" action="Check for STS File Type" level="error" message="STS file is found in STG Table([[A-11]])"/>
+            <rule when="Create WRK Table Statement" action="Check for STS File Type" level="error" message="STS file is found in WRK Table([[A-11]])"/>
+            <rule when="Create TEMP Table Statement" action="Check for STS File Type" level="error" message="STS file is found in TEMP Table([[A-11]])"/>
+        </rules>
+    </assembledTeradataPackageChecks>
+</checks>

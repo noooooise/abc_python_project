@@ -1,0 +1,13 @@
+<project default="MyXSLT">
+  <target name="MyXSLT">
+    <tstamp>
+      <format property="TODAY_UK" pattern="HH:mm dd-MM-yyyy" locale="en,UK"/>
+    </tstamp>
+    <xslt in="../output/HelloWorldReport.xml" out="../result.html" style="teradataQualityCheckTransform.xsl">
+      <param name="branchName" expression="TEST_BRANCH_NAME"/>
+      <param name="qaBuildId" expression="%teamcity.build.id%"/>
+      <param name="qaBuildTime" expression="${TODAY_UK}"/>
+      <param name="packagerBuildId" expression="TEST"/>
+    </xslt>
+  </target>
+</project>

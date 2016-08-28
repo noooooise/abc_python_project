@@ -1,0 +1,6 @@
+*.pyc
+.coverage
+htmlcov*/
+docs/
+output/
+.idea/

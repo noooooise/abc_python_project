@@ -1,0 +1,13 @@
+<checks>
+    <assembledTeradataPackageChecks>
+        <whens>
+            <when name="Someone Says BeetleJuice" value="BeetleJuice" type="CONTAINS" scope="SCRIPT" filter="ALL" />
+        </whens>
+        <actions>
+            <action name="Check for Duplicates" textMatch="BeetleJuice BeetleJuice BeetleJuice" />
+        </actions>
+        <rules>
+            <rule when="Someone Says BeetleJuice" action="Check for Duplicates" level="error" message="Oops!"/>
+        </rules>
+    </assembledTeradataPackageChecks>
+</checks>

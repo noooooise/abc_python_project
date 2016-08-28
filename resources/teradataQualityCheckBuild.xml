@@ -1,0 +1,13 @@
+<project default="MyXSLT">
+  <target name="MyXSLT">
+    <tstamp>
+      <format property="TODAY_UK" pattern="HH:mm dd-MM-yyyy" locale="en,UK"/>
+    </tstamp>
+    <xslt in="../output/junit-teradataQualityCheck.xml" out="../Quality_Check_Report.html" style="teradataQualityCheckTransform.xsl">
+      <param name="branchName" expression="%dep.GDW_DeveloperTools_PackageTeradata.teamcity.build.branch%"/>
+      <param name="qaBuildId" expression="%teamcity.build.id%"/>
+      <param name="qaBuildTime" expression="${TODAY_UK}"/>
+      <param name="packagerBuildId" expression="%dep.GDW_DeveloperTools_PackageTeradata.teamcity.build.id%"/>
+    </xslt>
+  </target>
+</project>

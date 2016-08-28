@@ -1,0 +1,11 @@
+###################################################################
+# This file defines version information for the current release
+#
+# CR_NUMBER is the Change ID
+# REL_MGR is the Release manager/coordinator
+# BACKUP_DATE is the date when the backedup objects can be removed
+###################################################################
+
+CR_NUMBER:C1234567
+REL_MGR:TEDS Team
+BACKUP_DATE:30-June-2015
